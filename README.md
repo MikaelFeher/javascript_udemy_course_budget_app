@@ -1,6 +1,6 @@
 # javascript_udemy_course_budget_app
 
-Taking a JavaScript course on [Udemy](www.udemy.com);
+I am currently taking a JavaScript course on [Udemy](www.udemy.com);
 
 [The Complete JavaScript Course: Build a Real-World Project](https://www.udemy.com/the-complete-javascript-course)
 

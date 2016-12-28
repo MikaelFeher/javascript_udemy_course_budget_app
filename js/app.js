@@ -65,6 +65,30 @@ var budgetController = (function() {
             return newItem;
         },
 
+        deleteItem: function(type, id) {
+            var ids, index;
+
+            //data.allItems[type][id];
+            /* This wouldn't work to get the specific item based on the id, this would just get the item with the index number passed in as the id. Since the indexed position in the array isn't connected to the id this is useless.
+            id = 6
+            ids = [1 2 4 6 8]
+            index = 3
+            */
+
+            // This maps through the array and creates a new array with the items id as the objects.
+            var ids = data.allItems[type].map(function(current) {
+                return current.id;
+            });
+
+            // The ".indexOf()"- method finds the index position of the passed in object.
+            index = ids.indexOf(id);
+
+            if (index !== -1) {
+                data.allItems[type].splice(index, 1);
+            }
+
+        },
+
         calculateBudget: function() {
             var totInc, totExp;
 
@@ -120,7 +144,8 @@ var UIController = (function() {
         incomeLabel: '.budget__income--value',
         expenseLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
-        monthLabel: '.budget__title--month'
+        monthLabel: '.budget__title--month',
+        container: '.container'
     };
 
 
@@ -141,13 +166,13 @@ var UIController = (function() {
 
                 element = DOMstrings.incomeContainer;
 
-                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
 
             } else if (type === 'exp') {
 
                 element = DOMstrings.expenseContainer;
 
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">%percentage%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">---</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }
 
             // Replace the placeholder text with som actual data
@@ -157,6 +182,13 @@ var UIController = (function() {
 
             // Insert the HTML into the DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+
+        },
+
+        deleteListItem: function(selectorID) {
+
+            var el = document.getElementById(selectorID);
+            el.parentNode.removeChild(el);
 
         },
 
@@ -228,6 +260,9 @@ var controller = (function(budgetCtrl, UICtrl) {
                 ctrlAddItem();
             }
         });
+
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
     };
 
     var updateBudget = function() {
@@ -264,6 +299,30 @@ var controller = (function(budgetCtrl, UICtrl) {
             updateBudget();
         }
     };
+
+    var ctrlDeleteItem = function(event) {
+        var itemID, splitID, type, ID;
+
+        /* Clicking on the delete icon on an individual exp or inc "post", but we want to target the entire "post" and not just the button, so we treverse the DOM by using ".parentNode" 4 times since the element we click on is nested 4 levels below the element we actually want to target. "Event Delegation".
+        Not the cleanest nor best solution since it calls for a heavy reliance on the DOM-structure.*/
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+        if (itemID) {
+
+            splitID = itemID.split('-')
+            type = splitID[0];
+            ID = parseInt(splitID[1]);
+
+            // 1. Delete the item from the data structure
+            budgetCtrl.deleteItem(type, ID);
+            // 2. Delete the itemn from the UI
+            UICtrl.deleteListItem(itemID);
+            // 3. Update and show the new budget
+            updateBudget();
+            
+        }
+
+    }
 
     return {
         init: function() {

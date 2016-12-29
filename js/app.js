@@ -133,7 +133,7 @@ var budgetController = (function() {
             b = 10/100 = 10
             c = 40/100 = 40%
             */
-            
+
             var totalIncome = data.totals.inc
 
             data.allItems.exp.forEach(function(cur) {
@@ -182,7 +182,8 @@ var UIController = (function() {
         expenseLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         monthLabel: '.budget__title--month',
-        container: '.container'
+        container: '.container',
+        itemPercentage: '.item__percentage'
     };
 
 
@@ -263,6 +264,27 @@ var UIController = (function() {
 
         },
 
+        displayPercentages: function(percentages) {
+            // This creates a "nodelist". Since it's a list we can't call forEach() on it...
+            var fields = document.querySelectorAll(DOMstrings.itemPercentage);
+
+            // ...so we create our own forEach()-method for nodelists...
+            var nodeListForEach = function(list, callback) {
+                for (var i = 0; i < list.length; i++){
+                    callback(list[i], i);
+                }
+            };
+
+            // ...and then call it
+            nodeListForEach(fields, function(current, index) {
+                if (percentages[index] > 0) {
+                    current.textContent = percentages[index] + '%';
+                } else {
+                    current.textContent = '---';
+                }
+            });
+        },
+
         displayMonth: function() {
             var monthsArr = ['January', 'Febuary', 'March', 'Apil', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -311,7 +333,7 @@ var controller = (function(budgetCtrl, UICtrl) {
         var percentages = budgetCtrl.getPercentages();
 
         // 3. Update the UI with the new percentages
-        console.log(percentages);
+        UICtrl.displayPercentages(percentages);
 
     };
 

@@ -4,7 +4,7 @@ This is the final project in [The Complete JavaScript Course: Build a Real-World
 
 ## This project is an app to calculate your budget
 
-You can find a live version **[here]('https://mikaelfeher.github.io/javascript_udemy_course_budget_app/')**
+You can find a live version **[here](https://mikaelfeher.github.io/javascript_udemy_course_budget_app/)**
 
 The html markup and css styling was provided by the instructor.
 

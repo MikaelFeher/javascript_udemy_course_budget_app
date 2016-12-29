@@ -215,6 +215,12 @@ var UIController = (function() {
 
     };
 
+    var nodeListForEach = function(list, callback) {
+        for (var i = 0; i < list.length; i++){
+            callback(list[i], i);
+        }
+    };
+
 
 
     return {
@@ -288,6 +294,7 @@ var UIController = (function() {
             document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
             document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
             document.querySelector(DOMstrings.expenseLabel).textContent = formatNumber(obj.totalExp, 'exp');
+            
             if (obj.percentage > 0) {
                 document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
             } else {
@@ -301,11 +308,11 @@ var UIController = (function() {
             var fields = document.querySelectorAll(DOMstrings.itemPercentage);
 
             // ...so we create our own forEach()-method for nodelists...
-            var nodeListForEach = function(list, callback) {
-                for (var i = 0; i < list.length; i++){
-                    callback(list[i], i);
-                }
-            };
+            // var nodeListForEach = function(list, callback) {
+            //     for (var i = 0; i < list.length; i++){
+            //         callback(list[i], i);
+            //     }
+            // };
 
             // ...and then call it
             nodeListForEach(fields, function(current, index) {
@@ -318,24 +325,44 @@ var UIController = (function() {
         },
 
         displayMonth: function() {
-            var monthsArr = ['January',
-                            'Febuary',
-                            'March',
-                            'Apil',
-                            'May',
-                            'June',
-                            'July',
-                            'August',
-                            'September',
-                            'October',
-                            'November',
-                            'December'];
+            var now, month, months, currentMonth, year;
+            months = ['January',
+                    'Febuary',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December'];
 
-            var month = new Date();
-            currentMonth = monthsArr[month.getMonth()];
+            now = new Date();
+
+            // year = now.getFullYear(); // Chose not to display the year since there is no backend to save the budget, making the year pointless.
+
+            month = now.getMonth();
+            currentMonth = months[month];
 
             document.querySelector(DOMstrings.monthLabel).textContent = currentMonth;
 
+        },
+
+        changedType: function() {
+
+            var fields = document.querySelectorAll(
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue
+            );
+
+            nodeListForEach(fields, function(cur) {
+                    cur.classList.toggle('red-focus');
+            });
+
+            document.querySelector(DOMstrings.inputButton).classList.toggle('red');
         },
 
         getDOMstrings: function() {
@@ -364,6 +391,8 @@ var controller = (function(budgetCtrl, UICtrl) {
         });
 
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
 
     };
 
@@ -449,13 +478,13 @@ var controller = (function(budgetCtrl, UICtrl) {
     return {
         init: function() {
             console.log('Application has started.');
+            UICtrl.displayMonth();
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
                 totalExp: 0,
                 percentage: -1
             });
-            UICtrl.displayMonth();
             setupEventListeners();
         }
     }
